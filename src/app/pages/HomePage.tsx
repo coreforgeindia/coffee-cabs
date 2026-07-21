@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import { gsap, ScrollTrigger } from "../utils/gsapSetup";
 import {
   ArrowRight,
   Shield,
@@ -24,6 +26,7 @@ import FleetComparison from "../components/FleetComparison";
 import PopularRoutesMatrix from "../components/PopularRoutesMatrix";
 
 export default function HomePage() {
+  const homeRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
@@ -76,11 +79,59 @@ export default function HomePage() {
     },
   ];
 
+  // GSAP Animations
+  useGSAP(
+    () => {
+      if (!homeRef.current) return;
+
+      // Hero Elements Reveal
+      gsap.from(".gsap-hero-badge", {
+        y: -30,
+        opacity: 0,
+        duration: 0.8,
+        ease: "back.out(1.7)",
+        delay: 0.1,
+      });
+
+      gsap.from(".gsap-hero-title", {
+        y: 40,
+        opacity: 0,
+        duration: 1,
+        ease: "power3.out",
+        delay: 0.2,
+      });
+
+      gsap.from(".gsap-hero-cta", {
+        scale: 0.9,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.15,
+        ease: "power2.out",
+        delay: 0.4,
+      });
+
+      // Section Fade Reveals on Scroll
+      gsap.utils.toArray<HTMLElement>(".gsap-section-reveal").forEach((section) => {
+        gsap.from(section, {
+          y: 40,
+          opacity: 0,
+          duration: 0.8,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: section,
+            start: "top 85%",
+          },
+        });
+      });
+    },
+    { scope: homeRef }
+  );
+
   return (
-    <div className="bg-white text-[#09090b]">
-      {/* ── 1. HERO SECTION (PULLED DOWN IMAGE VISIBILITY FIX) ── */}
+    <div ref={homeRef} className="bg-white text-[#09090b]">
+      {/* ── 1. HERO SECTION ── */}
       <section className="relative min-h-[92dvh] sm:min-h-dvh flex flex-col justify-between bg-[#09090b] text-white pt-16 overflow-hidden">
-        {/* Hero Background Image - Positioned to show vehicles clearly */}
+        {/* Hero Background Image */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
             src="/images/hero.png"
@@ -93,7 +144,7 @@ export default function HomePage() {
         {/* Center Content / Badge / Welcome */}
         <div className="relative z-10 max-w-2xl mx-auto px-4 text-center pt-8 sm:pt-14 flex flex-col items-center">
           {/* Rating Badge */}
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/20 text-xs font-semibold mb-5">
+          <div className="gsap-hero-badge inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/20 text-xs font-semibold mb-5 shadow-lg">
             <div className="flex gap-0.5 text-white">
               {Array.from({ length: 5 }).map((_, i) => (
                 <Star key={i} size={13} className="fill-white text-white" />
@@ -103,7 +154,7 @@ export default function HomePage() {
           </div>
 
           {/* Center Circular Logo Badge */}
-          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/10 backdrop-blur-xl border border-white/30 flex items-center justify-center p-2.5 mb-3 shadow-2xl">
+          <div className="gsap-hero-badge w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/10 backdrop-blur-xl border border-white/30 flex items-center justify-center p-2.5 mb-3 shadow-2xl">
             <img
               src="/images/logo.png"
               alt="Coffee Cabs Logo Badge"
@@ -111,28 +162,28 @@ export default function HomePage() {
             />
           </div>
 
-          <div className="inline-block tracking-widest text-[11px] uppercase font-extrabold text-neutral-300 mb-1">
+          <div className="gsap-hero-title inline-block tracking-widest text-[11px] uppercase font-extrabold text-neutral-300 mb-1">
             COFFEE CABS BANGALORE
           </div>
-          <p className="text-[11px] text-neutral-400 uppercase tracking-widest font-semibold mb-4">
+          <p className="gsap-hero-title text-[11px] text-neutral-400 uppercase tracking-widest font-semibold mb-4">
             Bangalore's Premier Luxury Car & Traveller Service
           </p>
 
           <h1
-            className="text-4xl sm:text-6xl font-extrabold text-white tracking-tight leading-none mb-3"
+            className="gsap-hero-title text-4xl sm:text-6xl font-extrabold text-white tracking-tight leading-none mb-3"
             style={{ fontFamily: "'Playfair Display', serif" }}
           >
             WELCOME
           </h1>
 
-          <p className="text-xs sm:text-sm text-neutral-300 max-w-md mx-auto mb-5 font-medium leading-relaxed">
+          <p className="gsap-hero-title text-xs sm:text-sm text-neutral-300 max-w-md mx-auto mb-5 font-medium leading-relaxed">
             Find your next ride, feel the power.
             <br />
             <span className="text-neutral-400">Where luxury meets performance & precision.</span>
           </p>
 
           {/* Key Quick Stats */}
-          <div className="grid grid-cols-3 gap-3 w-full max-w-sm mb-6 bg-black/50 backdrop-blur-md p-3 rounded-2xl border border-white/15">
+          <div className="gsap-hero-title grid grid-cols-3 gap-3 w-full max-w-sm mb-6 bg-black/50 backdrop-blur-md p-3 rounded-2xl border border-white/15 shadow-xl">
             <div>
               <div className="text-xs sm:text-sm font-extrabold text-white">8+ Years</div>
               <div className="text-[10px] text-neutral-400 font-semibold">Excellence</div>
@@ -153,13 +204,13 @@ export default function HomePage() {
               href="https://wa.me/917676726209?text=Hi%20Coffee%20Cabs!%20I%20want%20to%20book%20a%20luxury%20cab."
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-3 px-6 bg-[#25D366] text-white text-xs font-extrabold rounded-full hover:bg-[#1da851] transition-all duration-300 text-center shadow-xl flex items-center justify-center gap-2"
+              className="gsap-hero-cta w-full py-3 px-6 bg-[#25D366] text-white text-xs font-extrabold rounded-full hover:bg-[#1da851] hover:scale-105 transition-all duration-300 text-center shadow-xl flex items-center justify-center gap-2"
             >
               <MessageSquare size={15} /> Book via WhatsApp
             </a>
             <a
               href="tel:+917676726209"
-              className="w-full py-3 px-6 bg-white text-[#09090b] text-xs font-extrabold rounded-full hover:bg-neutral-200 transition-all duration-300 text-center flex items-center justify-center gap-2"
+              className="gsap-hero-cta w-full py-3 px-6 bg-white text-[#09090b] text-xs font-extrabold rounded-full hover:bg-neutral-200 hover:scale-105 transition-all duration-300 text-center flex items-center justify-center gap-2"
             >
               <Phone size={15} /> Call +91 76767 26209
             </a>
@@ -180,7 +231,7 @@ export default function HomePage() {
       </section>
 
       {/* ── 2. INTRO / ABOUT BLURB & 3 FEATURE ICONS ── */}
-      <section className="py-16 sm:py-20 bg-[#fafafa] border-b border-black/5">
+      <section className="gsap-section-reveal py-16 sm:py-20 bg-[#fafafa] border-b border-black/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 text-center max-w-3xl">
           <div className="text-xs uppercase tracking-widest text-[#71717a] font-extrabold mb-3">
             About Coffee Cabs
@@ -196,7 +247,7 @@ export default function HomePage() {
           </p>
 
           <div className="grid sm:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-3xl border border-black/10 shadow-sm text-center">
+            <div className="bg-white p-6 rounded-3xl border border-black/10 shadow-sm hover:shadow-md transition-shadow text-center">
               <div className="w-12 h-12 rounded-2xl bg-[#09090b] text-white flex items-center justify-center mx-auto mb-4 font-bold">
                 <Car size={22} />
               </div>
@@ -204,7 +255,7 @@ export default function HomePage() {
               <p className="text-xs text-[#71717a]">Fully owned commercial vehicles, sanitized & maintained to peak safety standards.</p>
             </div>
 
-            <div className="bg-white p-6 rounded-3xl border border-black/10 shadow-sm text-center">
+            <div className="bg-white p-6 rounded-3xl border border-black/10 shadow-sm hover:shadow-md transition-shadow text-center">
               <div className="w-12 h-12 rounded-2xl bg-[#09090b] text-white flex items-center justify-center mx-auto mb-4 font-bold">
                 <MessageSquare size={22} />
               </div>
@@ -212,7 +263,7 @@ export default function HomePage() {
               <p className="text-xs text-[#71717a]">Instant quotes, rapid booking confirmation, and active trip assistance.</p>
             </div>
 
-            <div className="bg-white p-6 rounded-3xl border border-black/10 shadow-sm text-center">
+            <div className="bg-white p-6 rounded-3xl border border-black/10 shadow-sm hover:shadow-md transition-shadow text-center">
               <div className="w-12 h-12 rounded-2xl bg-[#09090b] text-white flex items-center justify-center mx-auto mb-4 font-bold">
                 <Award size={22} />
               </div>
@@ -224,7 +275,7 @@ export default function HomePage() {
       </section>
 
       {/* ── 3. FLEET SECTION ── */}
-      <section id="fleet" className="py-16 sm:py-24 bg-white">
+      <section id="fleet" className="gsap-section-reveal py-16 sm:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
             <div>
@@ -261,7 +312,7 @@ export default function HomePage() {
       <PopularRoutesMatrix />
 
       {/* ── 6. HOW IT WORKS ── */}
-      <section className="py-16 sm:py-24 bg-white border-b border-black/5">
+      <section className="gsap-section-reveal py-16 sm:py-24 bg-white border-b border-black/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <div className="text-xs uppercase tracking-widest text-[#71717a] font-extrabold mb-3">
@@ -282,7 +333,7 @@ export default function HomePage() {
               { step: "03", title: "Get Instant Quote", desc: "Receive transparent per-km breakdown with driver allowance & 300km/day rule calculations." },
               { step: "04", title: "Confirm & Ride", desc: "Get driver details & vehicle confirmation. Enjoy a comfortable luxury journey!" },
             ].map((s) => (
-              <div key={s.step} className="bg-[#fafafa] p-8 rounded-3xl border border-black/10 relative shadow-sm">
+              <div key={s.step} className="bg-[#fafafa] p-8 rounded-3xl border border-black/10 relative shadow-sm hover:shadow-md transition-shadow">
                 <div className="text-3xl font-extrabold text-[#09090b] mb-4">{s.step}</div>
                 <h3 className="text-base font-bold text-[#09090b] mb-2">{s.title}</h3>
                 <p className="text-xs text-[#71717a] leading-relaxed">{s.desc}</p>
@@ -296,7 +347,7 @@ export default function HomePage() {
       <Calculator />
 
       {/* ── 8. DESTINATIONS EXPLORER ── */}
-      <section className="py-16 sm:py-24 bg-white">
+      <section className="gsap-section-reveal py-16 sm:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
             <div>
@@ -402,7 +453,7 @@ export default function HomePage() {
       </section>
 
       {/* ── 9. FAQ SECTION ── */}
-      <section className="py-16 sm:py-24 bg-[#fafafa] border-y border-black/5">
+      <section className="gsap-section-reveal py-16 sm:py-24 bg-[#fafafa] border-y border-black/5">
         <div className="max-w-4xl mx-auto px-4 sm:px-8">
           <div className="text-center mb-12">
             <div className="text-xs uppercase tracking-widest text-[#71717a] font-extrabold mb-3">
@@ -445,7 +496,7 @@ export default function HomePage() {
       </section>
 
       {/* ── 10. CTA BANNER ── */}
-      <section className="py-16 sm:py-20 bg-[#09090b] text-white">
+      <section className="gsap-section-reveal py-16 sm:py-20 bg-[#09090b] text-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-8 text-center space-y-6">
           <h2
             className="text-3xl sm:text-5xl font-extrabold text-white"
@@ -461,13 +512,13 @@ export default function HomePage() {
               href="https://wa.me/917676726209?text=Hi%20Coffee%20Cabs!%20I%20want%20to%20book%20a%20cab."
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#25D366] text-white text-xs font-bold rounded-full hover:bg-[#1da851] transition-colors shadow-xl w-full sm:w-auto"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#25D366] text-white text-xs font-bold rounded-full hover:bg-[#1da851] hover:scale-105 transition-all shadow-xl w-full sm:w-auto"
             >
               <MessageSquare size={16} /> Book via WhatsApp
             </a>
             <a
               href="tel:+917676726209"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-[#09090b] text-xs font-bold rounded-full hover:bg-neutral-200 transition-colors w-full sm:w-auto"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-[#09090b] text-xs font-bold rounded-full hover:bg-neutral-200 hover:scale-105 transition-all w-full sm:w-auto"
             >
               <Phone size={16} /> Call +91 76767 26209
             </a>
